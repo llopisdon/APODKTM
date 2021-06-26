@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/apodsListFragment">
+
+    <fragment
+        android:id="@+id/apodsListFragment"
+        android:name="com.machineinteractive.apodktm.ApodsListFragment"
+        android:label="fragment_apods_list"
+        tools:layout="@layout/fragment_apods_list" >
+        <action
+            android:id="@+id/action_apodsListFragment_to_apodDetailFragment"
+            app:destination="@id/apodDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/apodDetailFragment"
+        android:name="com.machineinteractive.apodktm.ApodDetailFragment"
+        android:label="fragment_apod_detail"
+        tools:layout="@layout/fragment_apod_detail" />
+</navigation>
