@@ -16,7 +16,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object DataModule {
-
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): ApodDatabase {
