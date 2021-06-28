@@ -13,10 +13,18 @@
         <action
             android:id="@+id/action_apodsListFragment_to_apodDetailFragment"
             app:destination="@id/apodDetailFragment" />
+        <action
+            android:id="@+id/action_apodsListFragment_to_pickMonthYearFragment"
+            app:destination="@id/pickMonthYearFragment" />
     </fragment>
     <fragment
         android:id="@+id/apodDetailFragment"
         android:name="com.machineinteractive.apodktm.ApodDetailFragment"
         android:label="fragment_apod_detail"
         tools:layout="@layout/fragment_apod_detail" />
+    <fragment
+        android:id="@+id/pickMonthYearFragment"
+        android:name="com.machineinteractive.apodktm.PickMonthYearFragment"
+        android:label="fragment_pick_month_year"
+        tools:layout="@layout/fragment_pick_month_year" />
 </navigation>

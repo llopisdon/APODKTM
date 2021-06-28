@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -65,25 +64,50 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         binding.run {
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
+
+            prevMonthButton.setOnClickListener {
+                Log.d(TAG, "prevMonthButton...")
+                viewModel.prevMonth()
+            }
+
+            nextMonthButton.setOnClickListener {
+                Log.d(TAG, "nextMonthButton...")
+                viewModel.nextMonth()
+            }
+
+            monthButton.setOnClickListener {
+                openPicker()
+            }
+
+            closeIcon.setOnClickListener {
+                closePicker()
+            }
         }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.apods.collect {
-                    Log.d(TAG, "apods: $it")
+                viewModel.uiState.collect {
                     when (it) {
                         is UiState.Loading -> {
                             Log.d(TAG, "loading...")
+                            showProgressBar(true)
+                            adapter.submitList(emptyList())
                         }
                         is UiState.Empty -> {
                             Log.d(TAG, "empty...")
+                            showProgressBar(false)
+                            adapter.submitList(emptyList())
+                            // TODO show empty message
                         }
                         is UiState.Error -> {
                             Log.d(TAG, "error...")
+                            showProgressBar(false)
                         }
                         is UiState.Success -> {
                             Log.d(TAG, "success...")
-                            adapter.submitList(it.data)
+                            showProgressBar(false)
+                            Log.d(TAG, "apods: ${it.apods}")
+                            adapter.submitList(it.apods)
                         }
                     }
                 }
@@ -91,7 +115,24 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         }
     }
 
-    override fun onClick(view: View) {
+    private fun openPicker() {
+        TODO("Not yet implemented")
+    }
+
+    private fun closePicker() {
+        TODO("Not yet implemented")
+    }
+
+    private fun showProgressBar(value: Boolean) {
+        binding.progressBar.visibility = when (value) {
+            true -> View.VISIBLE
+            else -> View.INVISIBLE
+        }
+    }
+
+    override fun onApodItemClick(view: View) {
+
+        if (isDetached) return
 
         exitTransition = MaterialElevationScale(false).apply {
             duration = 250L
@@ -107,6 +148,11 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         val directions = ApodsListFragmentDirections.actionApodsListFragmentToApodDetailFragment()
         findNavController().navigate(directions, extras)
     }
+
+
+
+
+
 }
 
 class ApodDiffCallback : DiffUtil.ItemCallback<Apod>() {
@@ -122,19 +168,19 @@ class ApodDiffCallback : DiffUtil.ItemCallback<Apod>() {
 class ApodAdapter(private val listener: ApodAdapter.Listener) : ListAdapter<Apod, ApodAdapter.ViewHolder>(ApodDiffCallback()) {
 
     interface Listener {
-        fun onClick(view: View)
+        fun onApodItemClick(view: View)
     }
 
     inner class ViewHolder(private val binding: ListItemApodBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.apod.setOnClickListener {
-                listener.onClick(it)
+                listener.onApodItemClick(it)
             }
         }
 
         fun bind(apod: Apod) {
-            binding.title.text = apod.title
+            binding.title.text = "${apod.date} | ${apod.title}"
             binding.image.load(apod.url)
             binding.apod.tag = apod
             binding.apod.transitionName =

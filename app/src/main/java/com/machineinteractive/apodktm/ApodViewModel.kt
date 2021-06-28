@@ -1,62 +1,90 @@
 package com.machineinteractive.apodktm
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class ApodViewModel @Inject constructor(private val repository: ApodRepository) : ViewModel() {
 
-    init {
-        Log.d(TAG, "ApodViewModel.init")
-    }
+    private var today = Clock.System.todayAt(TimeZone.currentSystemDefault())
+    private val maxDay = Clock.System.todayAt(TimeZone.currentSystemDefault())
 
-    val apods = repository.getApods().transformLatest { apods ->
-        withContext(Dispatchers.IO) {
-            val lastUpdate = repository.getLastUpdate()
-            val diff = System.currentTimeMillis() - lastUpdate
-            if (lastUpdate == -1L) {
-                Log.d(TAG, "initial load -- fetching apods...")
-                emit(UiState.Loading)
-                repository.updateApods()
-            } else{
-                Log.d(TAG, "we have APODs -- displaying...")
-                if (apods.isEmpty()) {
-                    emit(UiState.Empty)
-                } else {
-                    emit(UiState.Success(apods))
-                }
-                if (diff > 15_000L) {
-                    Log.d(TAG, "need to refresh APODS...")
-                    repository.updateApods()
-                }
-            }
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UiState.Loading
-    )
+    private val _uiState = MutableStateFlow<UiState>(UiState.Idle)
+    val uiState: StateFlow<UiState> = _uiState
 
     private val _selectedApod: MutableStateFlow<Apod?> = MutableStateFlow(null)
     val selectedApod: StateFlow<Apod?> = _selectedApod
 
+    init {
+        Log.d(TAG, "ApodViewModel.init...")
+        fetchApods()
+    }
+
     fun select(apod: Apod) {
-        viewModelScope.launch {
-            _selectedApod.value = apod
+        _selectedApod.value = apod
+    }
+
+    fun setCurrentMonthYear(fromDate: LocalDate) {
+        // TODO
+    }
+
+    fun fetchApods() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = UiState.Loading
+
+            if (repository.needsUpdate(today)) {
+                repository.updateApods(today)
+            }
+
+            val apods = repository.getApods(today).first()
+            if (apods.isEmpty()) {
+                _uiState.value = UiState.Empty
+            } else {
+                _uiState.value = UiState.Success(apods)
+            }
         }
+    }
+
+    fun prevMonth() {
+        val prevDate = today
+        today = today.minus(1, DateTimeUnit.MONTH)
+        if (today.monthNumber < APOD_EPOCH_MONTH && today.year == APOD_EPOCH_YEAR) {
+            today = prevDate
+        } else {
+            fetchApods()
+        }
+        Log.d(TAG, "prevMonth - prev: $prevDate cur: $today")
+    }
+
+    fun nextMonth() {
+        val prevDate = today
+        today = today.plus(1, DateTimeUnit.MONTH)
+        if (today > maxDay) {
+            today = prevDate
+        } else {
+            fetchApods()
+        }
+        Log.d(TAG, "nextMonth - prev: $prevDate cur: $today")
+
     }
 }
 
-sealed class UiState<T> {
-    object Empty : UiState<Nothing>()
-    object Loading : UiState<Nothing>()
-    object Error : UiState<Nothing>()
-    class Success<T>(val data: T) : UiState<T>()
+sealed class UiState {
+    object Idle : UiState()
+    object Empty : UiState()
+    object Loading : UiState()
+    object Error : UiState()
+    class Success(val apods: List<Apod>) : UiState()
 }

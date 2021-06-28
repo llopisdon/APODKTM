@@ -5,4 +5,29 @@
     <string name="apod_detail_transition_name">apod_card_detail</string>
     <string name="open_photo_with">Open Photo With</string>
 
+    <string name="next_year">next year</string>
+    <string name="prev_year">previous year</string>
+    <string name="year">Year</string>
+    <string name="month">Month</string>
+    <string name="pick_month_year"><![CDATA[Pick Month & Year]]></string>
+    <string name="pick_apod_month_and_year">Pick APOD Month and Year</string>
+    <string name="current_month_and_year">Current Month and Year:</string>
+    <string name="ok">OK</string>
+    <string name="close_pick_month_year">close pick month year</string>
+
+    <array name="months">
+        <item>JAN</item>
+        <item>FEB</item>
+        <item>MAR</item>
+        <item>APR</item>
+        <item>MAY</item>
+        <item>JUN</item>
+        <item>JUL</item>
+        <item>AUG</item>
+        <item>SEP</item>
+        <item>OCT</item>
+        <item>NOV</item>
+        <item>DEC</item>
+    </array>
+
 </resources>
