@@ -33,7 +33,8 @@ class ApodRepository(private val apodDao: ApodDao, private val client: HttpClien
         // TODO
         // fetch apods from today's date to start of month
 
-        val firstDayOfMonth = LocalDate(endDate.year, endDate.monthNumber, 1)
+//        val firstDayOfMonth = LocalDate(endDate.year, endDate.monthNumber, 1)
+        val firstDayOfMonth = endDate.minus(30, DateTimeUnit.DAY)
 
         Log.d(TAG, "updateApods - enddate: $endDate - firsday: $firstDayOfMonth")
 
@@ -62,7 +63,8 @@ class ApodRepository(private val apodDao: ApodDao, private val client: HttpClien
     }
 
     fun getApods(endDate: LocalDate): Flow<List<Apod>> {
-        val startDate = LocalDate(endDate.year, endDate.monthNumber, 1)
+        //val startDate = LocalDate(endDate.year, endDate.monthNumber, 1)
+        val startDate = endDate.minus(30, DateTimeUnit.DAY)
         return apodDao.getApods(startDate, endDate)
     }
 }

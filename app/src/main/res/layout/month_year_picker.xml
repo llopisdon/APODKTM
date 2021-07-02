@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pick_month_year_view"
+    tools:background="#28ff"
+    tools:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="invisible">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/pick_month_year_constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/close_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_baseline_close_24"
+                app:tint="?colorOnSurface"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="?attr/actionBarItemBackground"
+                android:contentDescription="@string/close_pick_month_year"
+                android:padding="12dp" />
+
+            <TextView
+                android:id="@+id/pick_apod_month_year_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pick_apod_month_and_year"
+                android:textAppearance="?attr/textAppearanceHeadline5" />
+
+            <TextView
+                android:id="@+id/cur_month_year"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pick_apod_month_year_label"
+                tools:text="JAN 2021"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:textAppearance="?attr/textAppearanceHeadline2" />
+
+            <TextView
+                android:id="@+id/year_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cur_month_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/year" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/prev_year_button"
+                app:backgroundTint="?attr/colorOnPrimary"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@+id/year_slider"
+                app:layout_constraintEnd_toStartOf="@id/year_slider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/year_slider"
+                app:tint="?attr/colorOnSurface"
+                tools:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/detail_text_padding"
+                android:clickable="true"
+                android:contentDescription="@string/prev_year"
+                android:focusable="true"
+                android:rotation="180"
+                android:src="@drawable/ic_baseline_remove_24"
+                android:visibility="visible" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/year_slider"
+                app:layout_constraintEnd_toStartOf="@+id/next_year_button"
+                app:layout_constraintStart_toEndOf="@+id/prev_year_button"
+                app:layout_constraintTop_toBottomOf="@id/year_label"
+                tools:valueFrom="1995"
+                tools:valueTo="2021"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/next_year_button"
+                app:backgroundTint="?attr/colorOnPrimary"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@+id/year_slider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/year_slider"
+                app:layout_constraintTop_toTopOf="@+id/year_slider"
+                app:tint="?attr/colorOnSurface"
+                tools:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/detail_text_padding"
+                android:clickable="true"
+                android:contentDescription="@string/next_year"
+                android:focusable="true"
+                android:rotation="180"
+                android:src="@drawable/ic_baseline_add_24"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/month_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/year_slider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/month" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/month_chips"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/month_label"
+                app:singleSelection="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_jan"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_feb"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mar"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_apr"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_may"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_jun"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_jul"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_aug"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sep"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_oct"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_nov"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_dec"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    tools:text="JAN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+            <Button
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:text="@string/ok" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

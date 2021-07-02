@@ -1,11 +1,13 @@
 package com.machineinteractive.apodktm
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.SharedElementCallback
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -17,7 +19,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import coil.load
+import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialElevationScale
 import com.machineinteractive.apodktm.databinding.FragmentApodsListBinding
 import com.machineinteractive.apodktm.databinding.ListItemApodBinding
@@ -54,7 +58,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         super.onViewCreated(view, savedInstanceState)
 
         postponeEnterTransition()
-
         view.doOnPreDraw {
             startPostponedEnterTransition()
         }
@@ -64,24 +67,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         binding.run {
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
-
-            prevMonthButton.setOnClickListener {
-                Log.d(TAG, "prevMonthButton...")
-                viewModel.prevMonth()
-            }
-
-            nextMonthButton.setOnClickListener {
-                Log.d(TAG, "nextMonthButton...")
-                viewModel.nextMonth()
-            }
-
-            monthButton.setOnClickListener {
-                openPicker()
-            }
-
-            closeIcon.setOnClickListener {
-                closePicker()
-            }
         }
 
         lifecycleScope.launch {
@@ -115,14 +100,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         }
     }
 
-    private fun openPicker() {
-        TODO("Not yet implemented")
-    }
-
-    private fun closePicker() {
-        TODO("Not yet implemented")
-    }
-
     private fun showProgressBar(value: Boolean) {
         binding.progressBar.visibility = when (value) {
             true -> View.VISIBLE
@@ -148,11 +125,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         val directions = ApodsListFragmentDirections.actionApodsListFragmentToApodDetailFragment()
         findNavController().navigate(directions, extras)
     }
-
-
-
-
-
 }
 
 class ApodDiffCallback : DiffUtil.ItemCallback<Apod>() {

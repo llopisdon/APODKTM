@@ -23,6 +23,7 @@ import androidx.navigation.fragment.findNavController
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialElevationScale
 import com.machineinteractive.apodktm.databinding.FragmentApodDetailBinding
 import com.machineinteractive.apodktm.databinding.FragmentApodsListBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,6 +85,7 @@ class ApodDetailFragment : Fragment() {
                 sharedElementSnapshots: MutableList<View>?
             ) {
                 super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots)
+                Log.d(TAG, "apod detail - shared element callback end")
                 view.doOnPreDraw {
                     binding.backButton.show()
                     binding.shareButton.show()

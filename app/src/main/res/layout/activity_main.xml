@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/apod_main_layout"
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -17,5 +18,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
+
+
+    <fragment
+        android:id="@+id/nav_overlay_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.machineinteractive.apodktm.NavOverlayFragment"
+        tools:layout="@layout/fragment_nav_overlay" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
