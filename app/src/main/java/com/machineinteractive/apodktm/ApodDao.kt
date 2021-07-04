@@ -9,7 +9,6 @@ import kotlinx.datetime.LocalDate
 
 @Dao
 interface ApodDao {
-
     // TODO - add query by date range
     @Query("SELECT * FROM apod ORDER BY date DESC")
     fun getAll(): Flow<List<Apod>>

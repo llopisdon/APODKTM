@@ -23,9 +23,7 @@ import androidx.navigation.fragment.findNavController
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialElevationScale
 import com.machineinteractive.apodktm.databinding.FragmentApodDetailBinding
-import com.machineinteractive.apodktm.databinding.FragmentApodsListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -49,7 +47,7 @@ class ApodDetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = MaterialContainerTransform().apply {
             drawingViewId = R.id.nav_host_fragment
-            duration = 250L
+            duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
             scrimColor = Color.TRANSPARENT
             setAllContainerColors(requireContext().themeColor(R.attr.colorSurface))
         }
@@ -71,7 +69,7 @@ class ApodDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (savedInstanceState?.getBoolean("back_button_visible", false) == true) {
+        if (savedInstanceState?.getBoolean(STATE_BACK_BUTTON_VISIBLE, false) == true) {
             binding.backButton.show()
             binding.shareButton.show()
         }
@@ -85,7 +83,6 @@ class ApodDetailFragment : Fragment() {
                 sharedElementSnapshots: MutableList<View>?
             ) {
                 super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots)
-                Log.d(TAG, "apod detail - shared element callback end")
                 view.doOnPreDraw {
                     binding.backButton.show()
                     binding.shareButton.show()
@@ -118,10 +115,13 @@ class ApodDetailFragment : Fragment() {
         }
     }
 
+
+    private val STATE_BACK_BUTTON_VISIBLE = "state_back_button_visible"
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
-        outState.putBoolean("back_button_visible", binding.backButton.isOrWillBeShown)
+        outState.putBoolean(STATE_BACK_BUTTON_VISIBLE, binding.backButton.isOrWillBeShown)
     }
 
     private fun showApod(apod: Apod) {

@@ -1,13 +1,11 @@
 package com.machineinteractive.apodktm
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.SharedElementCallback
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -19,9 +17,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.TransitionManager
 import coil.load
-import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialElevationScale
 import com.machineinteractive.apodktm.databinding.FragmentApodsListBinding
 import com.machineinteractive.apodktm.databinding.ListItemApodBinding
@@ -71,24 +67,24 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
+                viewModel.apodListUiState.collect {
                     when (it) {
-                        is UiState.Loading -> {
+                        is ApodListUiState.Loading -> {
                             Log.d(TAG, "loading...")
                             showProgressBar(true)
                             adapter.submitList(emptyList())
                         }
-                        is UiState.Empty -> {
+                        is ApodListUiState.Empty -> {
                             Log.d(TAG, "empty...")
                             showProgressBar(false)
                             adapter.submitList(emptyList())
                             // TODO show empty message
                         }
-                        is UiState.Error -> {
+                        is ApodListUiState.Error -> {
                             Log.d(TAG, "error...")
                             showProgressBar(false)
                         }
-                        is UiState.Success -> {
+                        is ApodListUiState.Success -> {
                             Log.d(TAG, "success...")
                             showProgressBar(false)
                             Log.d(TAG, "apods: ${it.apods}")
@@ -112,10 +108,10 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         if (isDetached) return
 
         exitTransition = MaterialElevationScale(false).apply {
-            duration = 250L
+            duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
         }
         reenterTransition = MaterialElevationScale(true).apply {
-            duration = 250L
+            duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
         }
 
         val apodDetailTransitionName = getString(R.string.apod_detail_transition_name)

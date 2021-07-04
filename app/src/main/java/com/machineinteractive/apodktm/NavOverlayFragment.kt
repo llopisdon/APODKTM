@@ -3,19 +3,30 @@ package com.machineinteractive.apodktm
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.forEach
+import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.transition.MaterialContainerTransform
 import com.machineinteractive.apodktm.databinding.FragmentNavOverlayBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import java.util.*
 
 class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListener {
 
@@ -23,6 +34,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
     private val binding get() = _binding!!
 
     private val viewModel: ApodViewModel by activityViewModels()
+
+    val monthChips = mutableListOf<Chip>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,16 +55,15 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         binding.run {
 
             bottomNavBar.prevMonthButton.setOnClickListener {
-                Log.d(TAG, "prevMonthButton...")
-                viewModel.prevMonth()
+                viewModel.navBarPrevMonth()
             }
 
             bottomNavBar.nextMonthButton.setOnClickListener {
-                Log.d(TAG, "nextMonthButton...")
-                viewModel.nextMonth()
+                viewModel.navBarNextMonth()
             }
 
             bottomNavBar.monthButton.setOnClickListener {
+                viewModel.resetPicker()
                 openPicker()
             }
 
@@ -59,10 +71,124 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                 closePicker()
             }
 
+            monthYearPicker.todayButton.setOnClickListener {
+                viewModel.setPickerCurDateToMaxDate()
+            }
+
+            monthYearPicker.okButton.setOnClickListener {
+                viewModel.setTodayToPickerCurMonthYear()
+                closePicker()
+            }
+
+            monthYearPicker.prevYearButton.setOnClickListener {
+                viewModel.decrementPickYear()
+            }
+
+            monthYearPicker.nextYearButton.setOnClickListener {
+                viewModel.incrementPickYear()
+            }
+
+            monthYearPicker.yearSlider.addOnChangeListener { _, value, _ ->
+                viewModel.setPickerYear(value.toInt())
+            }
+
+            monthChips.clear()
+            monthChips.add(monthYearPicker.chipJan)
+            monthChips.add(monthYearPicker.chipFeb)
+            monthChips.add(monthYearPicker.chipMar)
+            monthChips.add(monthYearPicker.chipApr)
+            monthChips.add(monthYearPicker.chipMay)
+            monthChips.add(monthYearPicker.chipJun)
+            monthChips.add(monthYearPicker.chipJul)
+            monthChips.add(monthYearPicker.chipAug)
+            monthChips.add(monthYearPicker.chipSep)
+            monthChips.add(monthYearPicker.chipOct)
+            monthChips.add(monthYearPicker.chipNov)
+            monthChips.add(monthYearPicker.chipDec)
+
+            resources.getStringArray(R.array.months).forEachIndexed { index, value ->
+                monthChips[index].text = value
+            }
+
+            monthYearPicker.monthChips.setOnCheckedChangeListener { group, checkedId ->
+                when (checkedId) {
+                    R.id.chip_jan -> viewModel.setPickerMonth(1)
+                    R.id.chip_feb -> viewModel.setPickerMonth(2)
+                    R.id.chip_mar -> viewModel.setPickerMonth(3)
+                    R.id.chip_apr -> viewModel.setPickerMonth(4)
+                    R.id.chip_may -> viewModel.setPickerMonth(5)
+                    R.id.chip_jun -> viewModel.setPickerMonth(6)
+                    R.id.chip_jul -> viewModel.setPickerMonth(7)
+                    R.id.chip_aug -> viewModel.setPickerMonth(8)
+                    R.id.chip_sep -> viewModel.setPickerMonth(9)
+                    R.id.chip_oct -> viewModel.setPickerMonth(10)
+                    R.id.chip_nov -> viewModel.setPickerMonth(11)
+                    R.id.chip_dec -> viewModel.setPickerMonth(12)
+                }
+            }
+
             view.doOnPreDraw {
                 findNavController().addOnDestinationChangedListener(this@NavOverlayFragment)
             }
+
+            lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.pickerUiState.collect {
+                        setBottomNavBarMonthButtonText(it.today)
+                        setupPickerViews(it.curPickerDate)
+                    }
+
+                    viewModel.bottomNavBarUiState.collect {
+                        with (bottomNavBar) {
+                            prevMonthButton.isEnabled = it.prevMonthEnabled
+                            monthButton.isEnabled = it.monthEnabled
+                            nextMonthButton.isEnabled = it.nextMonthEnabled
+                        }
+                    }
+                }
+            }}
+    }
+
+    // TODO - add handler for swipe back gesture
+
+    private fun setupPickerViews(curPickerDate: LocalDate) {
+
+        with(binding.monthYearPicker) {
+
+            val curYear = curPickerDate.year
+            val curMonthText = resources.getStringArray(R.array.months)[curPickerDate.monthNumber-1]
+
+            curMonthYear.text = resources.getString(R.string.cur_month_year, curMonthText, curYear)
+
+            // setup year slider
+            yearSlider.value = curYear.toFloat()
+            yearSlider.valueFrom = APOD_EPOCH_YEAR.toFloat()
+            yearSlider.valueTo = viewModel.maxDate.year.toFloat()
+            yearSlider.stepSize = 1f
+
+            monthChips.forEach {
+                (it as Chip).isEnabled = true
+            }
+
+            // setup month chips
+            if (curYear == APOD_EPOCH_YEAR) {
+                for (i in 0..4) {
+                    monthChips[i].isEnabled = false
+                }
+            } else if (curYear == viewModel.maxDate.year) {
+                val nextMonth = viewModel.maxDate.monthNumber
+                for (i in nextMonth..11) {
+                    monthChips[i].isEnabled = false
+                }
+            }
+
+            (monthChips[curPickerDate.monthNumber-1] as Chip).isChecked = true
         }
+    }
+
+    private fun setBottomNavBarMonthButtonText(today: LocalDate) {
+        val curMonthText = resources.getStringArray(R.array.months)[today.monthNumber-1]
+        binding.bottomNavBar.monthButton.text = resources.getString(R.string.cur_month_year, curMonthText, today.year)
     }
 
     private fun openPicker() {
@@ -94,19 +220,19 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         destination: NavDestination,
         arguments: Bundle?
     ) {
-
-        val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
-
         when (destination.id) {
             R.id.apodsListFragment -> {
                 ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", 0f).apply {
-                    duration = 250
+                    duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
+                    interpolator = DecelerateInterpolator()
                     start()
                 }
             }
             R.id.apodDetailFragment -> {
+                val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
                 ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", bottomNavHeight).apply {
-                    duration = 250
+                    duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
+                    interpolator = FastOutLinearInInterpolator()
                     start()
                 }
             }
