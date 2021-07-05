@@ -9,7 +9,7 @@
     <string name="prev_year">previous year</string>
     <string name="year">Year</string>
     <string name="month">Month</string>
-    <string name="select_month_and_year">Select Month &amp; Year</string>
+    <string name="pick_month_and_year">Pick Month &amp; Year</string>
     <string name="ok">OK</string>
     <string name="today">TODAY</string>
     <string name="close_pick_month_year">close pick month year</string>

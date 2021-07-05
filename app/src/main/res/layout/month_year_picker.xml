@@ -24,28 +24,27 @@
 
             <ImageButton
                 android:id="@+id/close_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
                 android:background="?attr/actionBarItemBackground"
                 android:contentDescription="@string/close_pick_month_year"
-                android:padding="12dp"
-                app:layout_constraintEnd_toStartOf="@id/select_month_year_label"
+                app:layout_constraintBottom_toBottomOf="@id/pick_month_year_label"
+                app:layout_constraintEnd_toStartOf="@id/pick_month_year_label"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/select_month_year_label"
-                app:layout_constraintBottom_toBottomOf="@id/select_month_year_label"
+                app:layout_constraintTop_toTopOf="@id/pick_month_year_label"
+                app:layout_constraintVertical_bias="0.42"
                 app:srcCompat="@drawable/ic_baseline_close_24"
-                app:tint="?colorOnSurface"
-                tools:layout_editor_absoluteY="30dp" />
+                app:tint="?colorOnSurface" />
 
             <TextView
-                android:id="@+id/select_month_year_label"
+                android:id="@+id/pick_month_year_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/select_month_and_year"
+                android:text="@string/pick_month_and_year"
                 android:textAppearance="?attr/textAppearanceHeadline5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/close_icon"
@@ -59,7 +58,7 @@
                 android:textAppearance="?attr/textAppearanceHeadline2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/select_month_year_label"
+                app:layout_constraintTop_toBottomOf="@id/pick_month_year_label"
                 tools:text="JAN 2021" />
 
             <TextView
