@@ -147,7 +147,7 @@ class ApodAdapter(private val listener: ApodAdapter.Listener) : ListAdapter<Apod
             }
         }
 
-        fun bind(apod: Apod) {
+        fun bind(apod: Apod, isLast: Boolean) {
             binding.title.text = "${apod.date} | ${apod.title}"
             binding.image.load(apod.url)
             binding.apod.tag = apod
@@ -155,6 +155,7 @@ class ApodAdapter(private val listener: ApodAdapter.Listener) : ListAdapter<Apod
                 itemView
                     .resources
                     .getString(R.string.list_item_apod_card_transition_name, apod.date)
+            binding.bottomSpacer.visibility = if (isLast) View.VISIBLE else View.GONE
         }
     }
 
@@ -165,7 +166,8 @@ class ApodAdapter(private val listener: ApodAdapter.Listener) : ListAdapter<Apod
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val isLast = position == itemCount - 1
+        holder.bind(getItem(position), isLast)
     }
 }
 
