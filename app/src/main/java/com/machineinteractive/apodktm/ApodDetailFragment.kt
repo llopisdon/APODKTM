@@ -150,7 +150,13 @@ class ApodDetailFragment : Fragment() {
                 .build()
             context.imageLoader.enqueue(request)
             apodTitle.text = apod.title
-            apodDateCopyright.text = "${apod.date} ${"(" + apod.copyright + ")"?: ""}"
+
+            apodDateCopyright.text = if (apod.copyright.isNullOrEmpty()) {
+                "${apod.date}"
+            } else {
+                "${apod.date} ${"(" + apod.copyright + ")"?: ""}"
+            }
+             
             apodExplanation.text = apod.explanation
         }
     }
