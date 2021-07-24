@@ -4,4 +4,5 @@
     <dimen name="bottom_nav_bar_height">72dp</dimen>
     <dimen name="settings_button_size">48dp</dimen>
     <dimen name="apod_list_item_height">256dp</dimen>
+    <dimen name="video_indicator_size">72dp</dimen>
 </resources>

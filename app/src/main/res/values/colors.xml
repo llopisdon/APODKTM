@@ -12,4 +12,6 @@
     <color name="apod_background">#F4F4FF</color>
     <color name="apod_archive_background">#FFF5FF</color>
 
+    <color name="video_indicator_tint">#ccbcbcbc</color>
+
 </resources>

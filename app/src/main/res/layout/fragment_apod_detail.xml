@@ -22,12 +22,31 @@
             android:orientation="vertical">
 
 
-            <com.github.chrisbanes.photoview.PhotoView
-                android:id="@+id/apod_image"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="392dp"
-                android:scaleType="centerCrop"
-                tools:src="@drawable/donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur" />
+                android:layout_height="392dp">
+
+                <com.github.chrisbanes.photoview.PhotoView
+                    android:id="@+id/apod_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    tools:src="@drawable/donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur" />
+
+                <ImageView
+                    android:id="@+id/video_indicator"
+                    android:layout_width="@dimen/video_indicator_size"
+                    android:layout_height="@dimen/video_indicator_size"
+                    android:src="@drawable/ic_baseline_play_circle_filled_24"
+                    android:layout_gravity="center"
+                    app:tint="@color/video_indicator_tint"
+                    android:visibility="invisible"
+                    android:clickable="true"
+                    tools:visibility="visible" />
+
+            </FrameLayout>
+
+
 
             <TextView
                 android:id="@+id/apod_title"

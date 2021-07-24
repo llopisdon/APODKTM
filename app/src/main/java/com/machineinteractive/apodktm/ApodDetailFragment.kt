@@ -3,6 +3,7 @@ package com.machineinteractive.apodktm
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.SharedElementCallback
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
@@ -29,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDate
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -129,6 +130,16 @@ class ApodDetailFragment : Fragment() {
     private fun showApod(apod: Apod) {
         binding.run {
 
+            binding.videoIndicator.visibility = if (apod.media_type == "video") {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+
+            binding.videoIndicator.setOnClickListener {
+                doPlayVideo(apod.url)
+            }
+
             val imageUrl =
                 if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
             val data = imageUrl.takeUnless { it.isEmpty() }
@@ -167,6 +178,18 @@ class ApodDetailFragment : Fragment() {
             }
 
             apodExplanation.text = apod.explanation
+        }
+    }
+
+    private fun doPlayVideo(url: String?) {
+        Log.d(TAG, "doPlayerVideo: $url")
+        if (isDetached) return
+        try {
+            val webpage: Uri = Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW, webpage)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext().applicationContext, R.string.no_video_player_found, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -213,6 +236,8 @@ class ApodDetailFragment : Fragment() {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, apod.url ?: APOD_URL)
             }
+
+
         } catch (e: IOException) {
             Log.d(TAG, "Unable to create shareIntents. Create bitmap failed: $e")
             sharePhotoIntent = null

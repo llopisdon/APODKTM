@@ -31,10 +31,10 @@
 
             <ImageView
                 android:id="@+id/video_indicator"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="@dimen/video_indicator_size"
+                android:layout_height="@dimen/video_indicator_size"
                 android:src="@drawable/ic_baseline_play_circle_filled_24"
-                card_view:tint="#ccbcbcbc"
+                card_view:tint="@color/video_indicator_tint"
                 android:layout_gravity="center" />
 
         </FrameLayout>
