@@ -29,11 +29,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 @AndroidEntryPoint
 class ApodDetailFragment : Fragment() {
@@ -71,7 +70,8 @@ class ApodDetailFragment : Fragment() {
 
         if (savedInstanceState?.getBoolean(STATE_BACK_BUTTON_VISIBLE, false) == true) {
             binding.backButton.show()
-            binding.shareButton.show()
+            binding.shareLinkButton.show()
+            binding.sharePhotoButton.show()
         }
 
         postponeEnterTransition()
@@ -85,19 +85,25 @@ class ApodDetailFragment : Fragment() {
                 super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots)
                 view.doOnPreDraw {
                     binding.backButton.show()
-                    binding.shareButton.show()
+                    binding.shareLinkButton.show()
+                    binding.sharePhotoButton.show()
                 }
             }
         })
 
         binding.backButton.setOnClickListener {
             binding.backButton.hide()
-            binding.shareButton.hide()
+            binding.shareLinkButton.hide()
+            binding.sharePhotoButton.hide()
             findNavController().navigateUp()
         }
 
-        binding.shareButton.setOnClickListener {
-            doShare()
+        binding.shareLinkButton.setOnClickListener {
+            doShareLink()
+        }
+
+        binding.sharePhotoButton.setOnClickListener {
+            doSharePhoto()
         }
 
         lifecycleScope.launch {
@@ -112,7 +118,6 @@ class ApodDetailFragment : Fragment() {
         }
     }
 
-
     private val STATE_BACK_BUTTON_VISIBLE = "state_back_button_visible"
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -124,7 +129,8 @@ class ApodDetailFragment : Fragment() {
     private fun showApod(apod: Apod) {
         binding.run {
 
-            val imageUrl = if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
+            val imageUrl =
+                if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
             val data = imageUrl.takeUnless { it.isEmpty() }
                 ?: R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur
 
@@ -141,7 +147,7 @@ class ApodDetailFragment : Fragment() {
                         lifecycleScope.launch {
                             whenStarted {
                                 withContext(Dispatchers.IO) {
-                                    buildPhotoShareIntent(result.toBitmap())
+                                    buildShareIntents(apod, result.toBitmap())
                                 }
                             }
                         }
@@ -157,14 +163,15 @@ class ApodDetailFragment : Fragment() {
             apodDateCopyright.text = if (apod.copyright.isNullOrEmpty()) {
                 "${apod.date}"
             } else {
-                "${apod.date} ${"(" + apod.copyright + ")"?: ""}"
+                "${apod.date} ${"(" + apod.copyright + ")" ?: ""}"
             }
-             
+
             apodExplanation.text = apod.explanation
         }
     }
 
-    private var shareIntent: Intent? = null
+    private var sharePhotoIntent: Intent? = null
+    private var shareLinkIntent: Intent? = null
 
     //
     // see: https://developer.android.com/training/secure-file-sharing/setup-sharing
@@ -172,16 +179,15 @@ class ApodDetailFragment : Fragment() {
     // see: https://developer.android.com/training/camera/photobasics
     // see: https://wares.commonsware.com/app/internal/book/Jetpack/page/chap-files-005.html
     //
-    private fun buildPhotoShareIntent(bitmap: Bitmap) {
+    private fun buildShareIntents(apod: Apod, bitmap: Bitmap) {
 
         if (isDetached) return
-
         try {
             val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
-            val timestamp: String = SimpleDateFormat("yyyy-MM-dd").format(Date())
-            val storageDir: File? = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val storageDir: File? =
+                requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val photoFile = File.createTempFile(
-                "apod-${timestamp}",
+                "apod-${apod.date}",
                 ".png",
                 storageDir
             )
@@ -190,30 +196,42 @@ class ApodDetailFragment : Fragment() {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
             }
 
-            val uri = FileProvider.getUriForFile(
+            val photoUri = FileProvider.getUriForFile(
                 requireActivity(),
                 AUTHORITY,
                 photoFile
             )
 
-            shareIntent = Intent().apply {
+            sharePhotoIntent = Intent().apply {
                 action = Intent.ACTION_SEND
                 type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, uri)
+                putExtra(Intent.EXTRA_STREAM, photoUri)
             }
 
-            Log.d(TAG, "shareIntent: $shareIntent")
-
+            shareLinkIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, apod.url ?: APOD_URL)
+            }
         } catch (e: IOException) {
-            Log.d(TAG, "Unable to create shareIntent. Create bitmap failed: $e")
-            shareIntent = null
+            Log.d(TAG, "Unable to create shareIntents. Create bitmap failed: $e")
+            sharePhotoIntent = null
+            shareLinkIntent = null
         }
     }
 
-    private fun doShare() {
-        shareIntent?.let {
-            Log.d(TAG, "doShare...")
-            val intent = Intent.createChooser(it, getString(R.string.open_photo_with))
+    private fun doSharePhoto() {
+        if (isDetached) return
+        sharePhotoIntent?.let {
+            val intent = Intent.createChooser(it, null)
+            startActivity(intent)
+        }
+    }
+
+    private fun doShareLink() {
+        if (isDetached) return
+        shareLinkIntent?.let {
+            val intent = Intent.createChooser(it, null)
             startActivity(intent)
         }
     }

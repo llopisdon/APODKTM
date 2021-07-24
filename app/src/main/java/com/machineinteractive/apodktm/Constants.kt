@@ -10,3 +10,5 @@ const val CLIENT_REQUEST_ERROR = "client_request_error"
 const val SERVER_ERROR = "server_error"
 const val NETWORK_ERROR = "network_error"
 const val UNKNOWN_ERROR = "unknown_error"
+
+const val APOD_URL = "https://apod.nasa.gov/"

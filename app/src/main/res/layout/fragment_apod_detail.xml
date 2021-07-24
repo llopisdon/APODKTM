@@ -84,7 +84,23 @@
             tools:visibility="visible" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/share_button"
+            android:id="@+id/share_link_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_baseline_link_24"
+            android:layout_margin="@dimen/detail_text_padding"
+            app:layout_constraintEnd_toStartOf="@id/share_photo_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:fabSize="mini"
+            app:backgroundTint="?attr/colorPrimaryVariant"
+            app:tint="?attr/colorOnSurface"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/share_photo_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
