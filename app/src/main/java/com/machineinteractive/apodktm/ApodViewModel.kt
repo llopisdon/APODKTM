@@ -52,7 +52,6 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         curJob = viewModelScope.launch(Dispatchers.IO) {
             if (!isActive) return@launch
             var hasApods = repository.curMonthHasApods(curDate.value)
-
             Log.d(TAG, "hasApods: $hasApods")
             if (!isActive) return@launch
             if (repository.needsUpdate(curDate.value)) {
@@ -68,7 +67,6 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
                     }
                 }
             }
-
             hasApods = repository.curMonthHasApods(curDate.value)
             _apodListUiState.value = ApodListUiState.Success(hasApods)
         }

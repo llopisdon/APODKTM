@@ -124,7 +124,7 @@ class ApodDetailFragment : Fragment() {
     private fun showApod(apod: Apod) {
         binding.run {
 
-            var imageUrl = if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
+            val imageUrl = if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
             val data = imageUrl.takeUnless { it.isEmpty() }
                 ?: R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur
 

@@ -28,6 +28,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialSharedAxis
 import com.machineinteractive.apodktm.databinding.FragmentNavOverlayBinding
+import io.ktor.client.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -57,6 +58,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNavOverlayBinding.inflate(layoutInflater, container, false)
+        binding.bottomNavBar.prevMonthButton.hide()
+        binding.bottomNavBar.nextMonthButton.hide()
         return binding.root
     }
 
@@ -143,20 +146,6 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                 }
             }
 
-
-            settingsButton.setOnClickListener {
-                (requireActivity() as MainActivity).currentNavigationFragment?.apply {
-                    exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
-                        duration = resources.getInteger(R.integer.material_transition_duration_large).toLong()
-                    }
-                    reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
-                        duration = resources.getInteger(R.integer.material_transition_duration_large).toLong()
-                    }
-                }
-                val directions = SettingsFragmentDirections.actionGlobalSettingsFragment()
-                findNavController().navigate(directions)
-            }
-
             view.doOnPreDraw {
                 findNavController().addOnDestinationChangedListener(this@NavOverlayFragment)
             }
@@ -170,10 +159,14 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                         }
                     }
                     launch {
-                        viewModel.bottomNavBarUiState.collect {
+                        viewModel.bottomNavBarUiState.collect { state ->
                             with (bottomNavBar) {
-                                prevMonthButton.isVisible = it.prevMonthEnabled
-                                nextMonthButton.isVisible = it.nextMonthEnabled
+                                prevMonthButton.apply {
+                                    if (state.prevMonthEnabled) show() else hide()
+                                }
+                                nextMonthButton.apply {
+                                    if (state.nextMonthEnabled) show() else hide()
+                                }
                             }
                         }
                     }
@@ -232,7 +225,6 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         TransitionManager.beginDelayedTransition(binding.navOverylayLayout, transform)
         binding.bottomNavBar.monthButton.visibility = View.INVISIBLE
         binding.monthYearPicker.pickMonthYearView.visibility = View.VISIBLE
-        binding.settingsButton.hide()
     }
 
     private fun closePicker() {
@@ -245,7 +237,6 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         TransitionManager.beginDelayedTransition(binding.navOverylayLayout, transform)
         binding.bottomNavBar.monthButton.visibility = View.VISIBLE
         binding.monthYearPicker.pickMonthYearView.visibility = View.INVISIBLE
-        binding.settingsButton.show()
         callback.isEnabled = false
     }
 
@@ -261,9 +252,7 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                     interpolator = DecelerateInterpolator()
                     start()
                 }
-                binding.settingsButton.show()
             }
-            R.id.settingsFragment,
             R.id.apodDetailFragment -> {
                 val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
                 ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", bottomNavHeight).apply {
@@ -271,7 +260,6 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                     interpolator = FastOutLinearInInterpolator()
                     start()
                 }
-                binding.settingsButton.hide()
             }
         }
     }

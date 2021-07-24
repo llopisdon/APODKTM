@@ -47,8 +47,8 @@
             android:textAppearance="?attr/textAppearanceHeadline5"
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="36sp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:paddingTop="8dp"
             android:paddingBottom="4dp"
             tools:text="TITLE GOES HERE"/>
@@ -62,7 +62,7 @@
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="36sp"
             android:layout_marginBottom="8dp"
-            android:paddingStart="8dp"
+            android:paddingStart="16dp"
             tools:text="06.16.1995"/>
 
         <View

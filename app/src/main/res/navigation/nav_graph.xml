@@ -18,12 +18,4 @@
         android:name="com.machineinteractive.apodktm.ApodDetailFragment"
         android:label="fragment_apod_detail"
         tools:layout="@layout/fragment_apod_detail" />
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.machineinteractive.apodktm.SettingsFragment"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
-    <action
-        android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment" />
 </navigation>

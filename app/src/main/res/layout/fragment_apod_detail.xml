@@ -78,7 +78,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:fabSize="mini"
-            app:backgroundTint="?attr/colorOnPrimary"
+            app:backgroundTint="?attr/colorPrimaryVariant"
             app:tint="?attr/colorOnSurface"
             android:visibility="invisible"
             tools:visibility="visible" />
@@ -94,7 +94,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:fabSize="mini"
-            app:backgroundTint="?attr/colorOnPrimary"
+            app:backgroundTint="?attr/colorPrimaryVariant"
             app:tint="?attr/colorOnSurface"
             android:visibility="invisible"
             tools:visibility="visible" />
