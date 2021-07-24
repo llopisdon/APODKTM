@@ -4,9 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import javax.inject.Inject
 
@@ -15,8 +14,15 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
     val maxDate = Clock.System.todayAt(TimeZone.currentSystemDefault())
 
-    private var curDate = Clock.System.todayAt(TimeZone.currentSystemDefault())
-    private var pickerCurDate = curDate
+    private val curDate = MutableStateFlow(maxDate)
+    private var pickerCurDate = maxDate
+    val apods: Flow<List<Apod>> = curDate.flatMapLatest {
+        repository.getApodsForCurMonth(it)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        emptyList()
+    )
 
     private val _apodListUiState = MutableStateFlow<ApodListUiState>(ApodListUiState.Idle)
     val apodListUiState: StateFlow<ApodListUiState> = _apodListUiState
@@ -24,35 +30,47 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
     private val _selectedApod: MutableStateFlow<Apod?> = MutableStateFlow(null)
     val selectedApod: StateFlow<Apod?> = _selectedApod
 
-    private val _pickerUiState = MutableStateFlow(PickerUiState(curDate, pickerCurDate))
+    private val _pickerUiState = MutableStateFlow(PickerUiState(maxDate, pickerCurDate))
     val pickerUiState: StateFlow<PickerUiState> = _pickerUiState
 
-    private val _bottomNavBarUiState = MutableStateFlow(BottomNavBarUiState(true, true, false))
+    private val _bottomNavBarUiState = MutableStateFlow(BottomNavBarUiState(true, false))
     val bottomNavBarUiState: StateFlow<BottomNavBarUiState> = _bottomNavBarUiState
 
     init {
         Log.d(TAG, "ApodViewModel.init...")
-        fetchApods()
     }
 
     fun select(apod: Apod) {
         _selectedApod.value = apod
     }
 
+    var curJob: Job? = null
+
     fun fetchApods() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _apodListUiState.value = ApodListUiState.Loading
+        Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
 
-            if (repository.needsUpdate(curDate)) {
-                repository.updateApods(curDate)
+        curJob = viewModelScope.launch(Dispatchers.IO) {
+            if (!isActive) return@launch
+            var hasApods = repository.curMonthHasApods(curDate.value)
+
+            Log.d(TAG, "hasApods: $hasApods")
+            if (!isActive) return@launch
+            if (repository.needsUpdate(curDate.value)) {
+                if (!isActive) return@launch
+                if (!hasApods) {
+                    _apodListUiState.value = ApodListUiState.Loading
+                }
+                when (val result = repository.updateApodsForCurMonth(curDate.value)) {
+                    is ApodResult.Error -> {
+                        hasApods = repository.curMonthHasApods(curDate.value)
+                        _apodListUiState.value = ApodListUiState.Error(hasApods, result)
+                        return@launch
+                    }
+                }
             }
 
-            val apods = repository.getApods(curDate).first()
-            if (apods.isEmpty()) {
-                _apodListUiState.value = ApodListUiState.Empty
-            } else {
-                _apodListUiState.value = ApodListUiState.Success(apods)
-            }
+            hasApods = repository.curMonthHasApods(curDate.value)
+            _apodListUiState.value = ApodListUiState.Success(hasApods)
         }
     }
 
@@ -61,28 +79,40 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
     //
 
     fun navBarPrevMonth() {
-        val prevDate = curDate
-        curDate = curDate.minus(1, DateTimeUnit.MONTH)
-        pickerCurDate = curDate
-        if (curDate.monthNumber < APOD_EPOCH_MONTH && curDate.year == APOD_EPOCH_YEAR) {
-            curDate = prevDate
-            pickerCurDate = prevDate
-        } else {
-            fetchApods()
-            _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+        var date = curDate.value
+        date = date.minus(1, DateTimeUnit.MONTH)
+        if (!(date.monthNumber < APOD_EPOCH_MONTH && date.year == APOD_EPOCH_YEAR)) {
+            curDate.value = date
+            pickerCurDate = date
+            _pickerUiState.value = PickerUiState(date, pickerCurDate)
+            viewModelScope.launch {
+                curJob?.cancelAndJoin()
+                fetchApods()
+            }
+            updateBottomNavBarUiState()
         }
     }
 
     fun navBarNextMonth() {
-        val prevDate = curDate
-        curDate = curDate.plus(1, DateTimeUnit.MONTH)
-        pickerCurDate = curDate
-        if (curDate > maxDate) {
-            curDate = prevDate
-            pickerCurDate = prevDate
-        } else {
-            fetchApods()
-            _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+        var date = curDate.value
+        date = date.plus(1, DateTimeUnit.MONTH)
+        if (date <= maxDate) {
+            curDate.value = date
+            pickerCurDate = date
+            _pickerUiState.value = PickerUiState(date, pickerCurDate)
+            viewModelScope.launch {
+                curJob?.cancelAndJoin()
+                fetchApods()
+            }
+            updateBottomNavBarUiState()
+        }
+    }
+
+    private fun updateBottomNavBarUiState() {
+        curDate.value.let {
+            val prevEnabled = it.monthNumber != APOD_EPOCH_MONTH || it.year != APOD_EPOCH_YEAR
+            val nextEnabled = it.monthNumber != maxDate.monthNumber || it.year != maxDate.year
+            _bottomNavBarUiState.value = BottomNavBarUiState(prevEnabled, nextEnabled)
         }
     }
 
@@ -90,27 +120,36 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
     // Picker Month Year Methods
     //
 
-    fun setTodayToPickerCurMonthYear() {
-        curDate = pickerCurDate
-        _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
-        fetchApods()
+    fun setCurDateFromPicker() {
+        curDate.value = pickerCurDate
+        _pickerUiState.value = PickerUiState(curDate.value, pickerCurDate)
+        updateBottomNavBarUiState()
+        viewModelScope.launch {
+            curJob?.cancelAndJoin()
+            fetchApods()
+        }
     }
 
     fun resetPicker() {
-        pickerCurDate = curDate
-        _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+        pickerCurDate = curDate.value
+        _pickerUiState.value = PickerUiState(curDate.value, pickerCurDate)
     }
 
-    fun setPickerCurDateToMaxDate() {
-        pickerCurDate = maxDate
-        _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+    fun setPickerToMaxDate() {
+        curDate.value = maxDate
+        _pickerUiState.value = PickerUiState(curDate.value, pickerCurDate)
+        updateBottomNavBarUiState()
+        viewModelScope.launch {
+            curJob?.cancelAndJoin()
+            fetchApods()
+        }
     }
 
     fun setPickerMonth(month: Int) {
         val prevDate = pickerCurDate
         val newDate = LocalDate(prevDate.year, month, 1)
         pickerCurDate = newDate
-        _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+        _pickerUiState.value = PickerUiState(curDate.value, pickerCurDate)
     }
 
     fun setPickerYear(year: Int) {
@@ -134,7 +173,7 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
         pickerCurDate = newDate
 
-        _pickerUiState.value = PickerUiState(curDate, pickerCurDate)
+        _pickerUiState.value = PickerUiState(curDate.value, pickerCurDate)
     }
 
     fun incrementPickYear() {
@@ -146,18 +185,16 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
     }
 }
 
-class BottomNavBarUiState(
+data class BottomNavBarUiState(
     val prevMonthEnabled: Boolean,
-    val monthEnabled: Boolean,
     val nextMonthEnabled: Boolean
 )
 
-class PickerUiState(val today: LocalDate, val curPickerDate: LocalDate)
+data class PickerUiState(val today: LocalDate, val curPickerDate: LocalDate)
 
 sealed class ApodListUiState {
     object Idle : ApodListUiState()
-    object Empty : ApodListUiState()
     object Loading : ApodListUiState()
-    object Error : ApodListUiState()
-    class Success(val apods: List<Apod>) : ApodListUiState()
+    class Error(val hasApods: Boolean, val error: ApodResult.Error) : ApodListUiState()
+    class Success(val hasApods: Boolean) : ApodListUiState()
 }

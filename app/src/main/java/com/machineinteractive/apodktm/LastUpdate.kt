@@ -8,5 +8,5 @@ import kotlinx.datetime.LocalDate
 data class LastUpdate(
     @PrimaryKey
     val id: String,
-    val date: LocalDate
+    val timestamp: Long
 )

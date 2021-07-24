@@ -53,17 +53,17 @@ class ApodDetailFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentApodDetailBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -102,13 +102,10 @@ class ApodDetailFragment : Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.selectedApod.collect {
-                    if (it != null) {
-                        Log.d(TAG, "SHOW APOD: $it")
-                        showApod(it)
-
-                    } else {
-                        Log.d(TAG, "GOT NULL APOD!")
+                launch {
+                    viewModel.selectedApod.collect { apod ->
+                        Log.d(TAG, "SHOW APOD: $apod")
+                        apod?.let { showApod(it) }
                     }
                 }
             }
@@ -126,9 +123,15 @@ class ApodDetailFragment : Fragment() {
 
     private fun showApod(apod: Apod) {
         binding.run {
+
+            var imageUrl = if (apod.media_type == "image") apod.url.orEmpty() else apod.thumbnail_url.orEmpty()
+            val data = imageUrl.takeUnless { it.isEmpty() }
+                ?: R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur
+
             val context = binding.root.context
             val request = ImageRequest.Builder(context)
-                .data(apod.url)
+                .data(data)
+                .placeholder(R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur)
                 .target(
                     onSuccess = { result ->
                         apodImage.setImageDrawable(result)
@@ -164,6 +167,8 @@ class ApodDetailFragment : Fragment() {
     private var shareIntent: Intent? = null
 
     //
+    // see: https://developer.android.com/training/secure-file-sharing/setup-sharing
+    // see: https://developer.android.com/training/data-storage/shared
     // see: https://developer.android.com/training/camera/photobasics
     // see: https://wares.commonsware.com/app/internal/book/Jetpack/page/chap-files-005.html
     //
@@ -173,10 +178,10 @@ class ApodDetailFragment : Fragment() {
 
         try {
             val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
-            val timestamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            val timestamp: String = SimpleDateFormat("yyyy-MM-dd").format(Date())
             val storageDir: File? = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val photoFile = File.createTempFile(
-                "APOD_${timestamp}_",
+                "apod-${timestamp}",
                 ".png",
                 storageDir
             )

@@ -22,26 +22,31 @@
             android:orientation="vertical">
 
 
-            <ImageView
+            <com.github.chrisbanes.photoview.PhotoView
                 android:id="@+id/apod_image"
                 android:layout_width="match_parent"
                 android:layout_height="392dp"
                 android:scaleType="centerCrop"
-                tools:src="@drawable/nasa_logo" />
+                tools:src="@drawable/donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur" />
 
             <TextView
                 android:id="@+id/apod_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/detail_text_padding"
-                android:textAppearance="?attr/textAppearanceHeadline4"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="4dp"
+                android:textAppearance="?attr/textAppearanceHeadline5"
                 tools:text="de Finibus Bonorum et Malorum" />
 
             <TextView
                 android:id="@+id/apod_date_copyright"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/detail_text_padding"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 app:autoSizeTextType="uniform"
                 tools:text="45 BC - Cicero" />
@@ -50,8 +55,10 @@
                 android:id="@+id/apod_explanation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="@dimen/detail_text_padding"
                 android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
                 app:autoSizeTextType="uniform"
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
 
@@ -66,6 +73,7 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_baseline_arrow_back_24"
+            android:contentDescription="@string/back_button"
             android:layout_margin="@dimen/detail_text_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

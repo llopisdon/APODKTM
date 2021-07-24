@@ -32,19 +32,7 @@ object DataModule {
     }
 
     @Provides
-    fun provideHttpClient(): HttpClient {
-        return HttpClient(CIO) {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-                    prettyPrint = true
-                    isLenient = true
-                })
-            }
-        }
-    }
-
-    @Provides
-    fun provideApodRepository(apodDao: ApodDao, client: HttpClient): ApodRepository {
-        return ApodRepository(apodDao, client)
+    fun provideApodRepository(apodDao: ApodDao): ApodRepository {
+        return ApodRepository(apodDao)
     }
 }

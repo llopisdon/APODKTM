@@ -3,14 +3,18 @@ package com.machineinteractive.apodktm
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.forEach
 import androidx.core.view.get
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.lifecycle.Lifecycle
@@ -22,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialSharedAxis
 import com.machineinteractive.apodktm.databinding.FragmentNavOverlayBinding
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -36,6 +41,16 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
     private val viewModel: ApodViewModel by activityViewModels()
 
     val monthChips = mutableListOf<Chip>()
+
+    private lateinit var callback: OnBackPressedCallback
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+            closePicker()
+        }
+        callback.isEnabled = false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,11 +87,12 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
             }
 
             monthYearPicker.todayButton.setOnClickListener {
-                viewModel.setPickerCurDateToMaxDate()
+                viewModel.setPickerToMaxDate()
+                closePicker()
             }
 
             monthYearPicker.okButton.setOnClickListener {
-                viewModel.setTodayToPickerCurMonthYear()
+                viewModel.setCurDateFromPicker()
                 closePicker()
             }
 
@@ -127,29 +143,43 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                 }
             }
 
+
+            settingsButton.setOnClickListener {
+                (requireActivity() as MainActivity).currentNavigationFragment?.apply {
+                    exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+                        duration = resources.getInteger(R.integer.material_transition_duration_large).toLong()
+                    }
+                    reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+                        duration = resources.getInteger(R.integer.material_transition_duration_large).toLong()
+                    }
+                }
+                val directions = SettingsFragmentDirections.actionGlobalSettingsFragment()
+                findNavController().navigate(directions)
+            }
+
             view.doOnPreDraw {
                 findNavController().addOnDestinationChangedListener(this@NavOverlayFragment)
             }
 
             lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.pickerUiState.collect {
-                        setBottomNavBarMonthButtonText(it.today)
-                        setupPickerViews(it.curPickerDate)
+                    launch {
+                        viewModel.pickerUiState.collect {
+                            setBottomNavBarMonthButtonText(it.today)
+                            setupPickerViews(it.curPickerDate)
+                        }
                     }
-
-                    viewModel.bottomNavBarUiState.collect {
-                        with (bottomNavBar) {
-                            prevMonthButton.isEnabled = it.prevMonthEnabled
-                            monthButton.isEnabled = it.monthEnabled
-                            nextMonthButton.isEnabled = it.nextMonthEnabled
+                    launch {
+                        viewModel.bottomNavBarUiState.collect {
+                            with (bottomNavBar) {
+                                prevMonthButton.isVisible = it.prevMonthEnabled
+                                nextMonthButton.isVisible = it.nextMonthEnabled
+                            }
                         }
                     }
                 }
             }}
     }
-
-    // TODO - add handler for swipe back gesture
 
     private fun setupPickerViews(curPickerDate: LocalDate) {
 
@@ -192,6 +222,7 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
     }
 
     private fun openPicker() {
+        callback.isEnabled = true
         val transform = MaterialContainerTransform().apply {
             startView = binding.bottomNavBar.monthButton
             endView = binding.monthYearPicker.pickMonthYearView
@@ -201,6 +232,7 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         TransitionManager.beginDelayedTransition(binding.navOverylayLayout, transform)
         binding.bottomNavBar.monthButton.visibility = View.INVISIBLE
         binding.monthYearPicker.pickMonthYearView.visibility = View.VISIBLE
+        binding.settingsButton.hide()
     }
 
     private fun closePicker() {
@@ -213,6 +245,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         TransitionManager.beginDelayedTransition(binding.navOverylayLayout, transform)
         binding.bottomNavBar.monthButton.visibility = View.VISIBLE
         binding.monthYearPicker.pickMonthYearView.visibility = View.INVISIBLE
+        binding.settingsButton.show()
+        callback.isEnabled = false
     }
 
     override fun onDestinationChanged(
@@ -227,7 +261,9 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                     interpolator = DecelerateInterpolator()
                     start()
                 }
+                binding.settingsButton.show()
             }
+            R.id.settingsFragment,
             R.id.apodDetailFragment -> {
                 val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
                 ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", bottomNavHeight).apply {
@@ -235,6 +271,7 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                     interpolator = FastOutLinearInInterpolator()
                     start()
                 }
+                binding.settingsButton.hide()
             }
         }
     }

@@ -34,7 +34,26 @@ data class Apod(
     var media_type: String? = null,
     var service_version: String? = null,
     var title: String? = null,
-    var url: String? = null
+    var url: String? = null,
+    var thumbnail_url: String? = null
+)
+
+@Serializable
+data class ApodApiErrorResponse(
+    val error: ApodApiError
+)
+
+@Serializable
+data class ApodApiError(
+    val code: String,
+    var message: String
+)
+
+@Serializable
+data class ApodServerErrorResponse(
+    val code: Int,
+    val msg: String,
+    val service_version: String
 )
 
 

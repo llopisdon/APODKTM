@@ -18,6 +18,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        def apodApiKey = project.findProperty("nasa_apod_api_key") ?: 'DEMO_KEY'
+        println("APOD KEY: $apodApiKey")
+        buildConfigField("String", "APOD_API_KEY", "\"${apodApiKey}\"")
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -79,4 +83,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.2.1"
 
     implementation "io.coil-kt:coil:1.2.2"
+
+    implementation 'com.github.Baseflow:PhotoView:2.3.0'
 }
