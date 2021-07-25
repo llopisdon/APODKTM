@@ -81,9 +81,13 @@ class ApodRepository(private val apodDao: ApodDao) {
         return result
     }
 
+    //
     // note: sometimes requesting thumbnails can cause the server to crash with a 500
     // this has been reported by several people. need to check for 500 then try
     // a second request without thumbs to work around this.
+    // see:
+    // https://github.com/nasa/apod-api/issues/78
+    //
     private suspend fun fetchApods(
         startDate: LocalDate,
         endDate: LocalDate
@@ -189,7 +193,7 @@ class ApodRepository(private val apodDao: ApodDao) {
 
         //
         // first check to see if we have any updates for the passed in month
-        // no regardless of the date
+        // regardless of the date
         //
 
         val lastUpdate = apodDao.getLastUpdate(id)

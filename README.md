@@ -1,13 +1,27 @@
-![apodktm logo](app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png)
-
 # Astronomy Picture of the Day + Kotlin + Material Design (APODKTM)
 
+![apodktm logo](app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png)
 
-A sample Android app that stores and displays the NASA Astronomy Picture of the Day (APOD) for each month.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Android CI](https://github.com/llopisdon/APODKTM/actions/workflows/android.yml/badge.svg)](https://github.com/llopisdon/APODKTM/actions/workflows/android.yml)
+
+# About
+
+A sample Android app for viewing the NASA Astronomy Picture of the Day (APOD) archive for each month.
+
+# Download
+
+The latest DEBUG APK can be found here:
+
+![](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Latest&query=%24.name&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fllopisdon%2FAPODKTM%2Freleases%2Flatest)
+
+[releases/latest/download/app-debug.apk](https://github.com/llopisdon/APODKTM/releases/latest/download/app-debug.apk)
+
+# Screenshots
 
 ![screenshot](assets/screenshot.png)
 
-The app demonstrates the use of the following technologies:
+
+## The app demonstrates the use of the following technologies:
 
 * Coil
 * Hilt
