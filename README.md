@@ -25,12 +25,12 @@ The latest DEBUG APK can be found here:
 
 * Coil
 * Hilt
-* Kotlin
-* Kotlin Coroutines
-* Kotlin Flows
 * Jetpack Architecture Components
 * Jetpack Navigation
 * Jetpack Room
+* Kotlin
+* Kotlin Coroutines
+* Kotlin Flows
 * kotlinx.serialization
 * Ktor
 * Material Components for Android

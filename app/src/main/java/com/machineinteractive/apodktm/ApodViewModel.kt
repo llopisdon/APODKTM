@@ -48,7 +48,6 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
     fun fetchApods() {
         Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
-
         curJob = viewModelScope.launch(Dispatchers.IO) {
             if (!isActive) return@launch
             var hasApods = repository.curMonthHasApods(curDate.value)
