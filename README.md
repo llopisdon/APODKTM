@@ -17,6 +17,7 @@ The latest DEBUG APK can be found here:
 # Screenshots
 
 ![screenshot](assets/screenshot.png)
+![screenshot](assets/screenshot_tablet.png)
 
 
 ## The app demonstrates the use of the following technologies:

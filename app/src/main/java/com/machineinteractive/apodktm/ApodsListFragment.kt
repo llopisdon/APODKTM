@@ -88,8 +88,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         }
     }
 
-
-
     private fun showProgressBar(value: Boolean) {
         binding.progressBar.visibility = when (value) {
             true -> View.VISIBLE
