@@ -1,5 +1,6 @@
 package com.machineinteractive.apodktm
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,10 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import coil.imageLoader
 import coil.load
 import coil.request.ImageRequest
@@ -64,8 +62,18 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
 
         adapter = ApodAdapter(this)
 
+        val isWideScreen = resources.getBoolean(R.bool.wide_screen)
+        val isLandscape  = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val useGridLayout = isLandscape || isWideScreen
+
         binding.run {
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.layoutManager = if (useGridLayout) {
+                val spanCount = if (isLandscape && !isWideScreen) 2 else 3
+                GridLayoutManager(requireContext(), spanCount)
+            } else {
+                LinearLayoutManager(requireContext())
+            }
+
             recyclerView.adapter = adapter
         }
 
