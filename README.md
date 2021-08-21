@@ -25,9 +25,7 @@ The latest DEBUG APK can be found here:
 
 * Coil
 * Hilt
-* Jetpack Architecture Components
-* Jetpack Navigation
-* Jetpack Room
+* Jetpack Architecture Components: Lifecycle, Navigation, Room, ViewModel
 * Kotlin
 * Kotlin Coroutines
 * Kotlin Flows
