@@ -12,9 +12,7 @@ A sample Android app for viewing the NASA Astronomy Picture of the Day (APOD) ar
 
 The latest DEBUG APK can be found here:
 
-![](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Latest&query=%24.name&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fllopisdon%2FAPODKTM%2Freleases%2Flatest)
-
-[releases/latest/download/app-debug.apk](https://github.com/llopisdon/APODKTM/releases/latest/download/app-debug.apk)
+[![](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Latest&query=%24.name&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fllopisdon%2FAPODKTM%2Freleases%2Flatest)](https://github.com/llopisdon/APODKTM/releases/latest/download/app-debug.apk)
 
 # Screenshots
 
