@@ -76,12 +76,6 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
                         updateUi(state)
                     }
                 }
-                launch {
-                    viewModel.apods.collect {
-                        adapter.submitList(it)
-                    }
-                }
-                viewModel.fetchApods()
             }
         }
     }
@@ -96,45 +90,36 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
     }
 
     private fun updateUi(state: ApodListUiState) {
-        when (state) {
-            is ApodListUiState.Idle -> {
-                // NO-OP
+        showProgressBar(state.loading)
+
+        if (state.error != null) {
+            snackbar = Snackbar.make(
+                binding.snackbarArea,
+                "${state.error.message}",
+                Snackbar.LENGTH_INDEFINITE
+            )
+            snackbar?.setAction(getString(R.string.retry)) {
+                snackbar?.dismiss()
+                snackbar = null
+                viewModel.fetchApods()
             }
-            is ApodListUiState.Loading -> {
-                Log.d(TAG, "loading...")
-                showProgressBar(true)
-                adapter.submitList(emptyList())
-                binding.emptyText.visibility = View.INVISIBLE
-            }
-            is ApodListUiState.Error -> {
-                Log.d(TAG, "error...")
-                showProgressBar(false)
-                toggleEmptyState(state.hasApods)
-                snackbar = Snackbar.make(
-                    binding.snackbarArea,
-                    "${state.error.message}",
-                    Snackbar.LENGTH_INDEFINITE
-                )
-                snackbar?.setAction(getString(R.string.retry)) {
-                    snackbar?.dismiss()
-                    snackbar = null
-                    viewModel.fetchApods()
-                }
-                snackbar?.show()
-            }
-            is ApodListUiState.Success -> {
-                Log.d(TAG, "success...")
-                showProgressBar(false)
-                toggleEmptyState(state.hasApods)
-            }
+            snackbar?.show()
+        }
+
+        adapter.submitList(state.apods)
+
+        if (state.apods.isEmpty() && !state.loading) {
+            toggleEmptyState(true)
+        } else {
+            toggleEmptyState(false)
         }
     }
 
-    private fun toggleEmptyState(hasApods: Boolean) {
-        binding.emptyText.visibility = if (hasApods) {
-            View.INVISIBLE
-        } else {
+    private fun toggleEmptyState(value: Boolean) {
+        binding.emptyText.visibility = if (value) {
             View.VISIBLE
+        } else {
+            View.INVISIBLE
         }
     }
 

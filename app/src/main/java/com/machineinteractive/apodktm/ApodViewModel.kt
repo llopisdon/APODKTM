@@ -16,15 +16,12 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
     private val curDate = MutableStateFlow(maxDate)
     private var pickerCurDate = maxDate
-    val apods: Flow<List<Apod>> = curDate.flatMapLatest {
+    @ExperimentalCoroutinesApi
+    private val apods: Flow<List<Apod>> = curDate.flatMapLatest {
         repository.getApodsForCurMonth(it)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        emptyList()
-    )
+    }
 
-    private val _apodListUiState = MutableStateFlow<ApodListUiState>(ApodListUiState.Idle)
+    private val _apodListUiState = MutableStateFlow(ApodListUiState())
     val apodListUiState: StateFlow<ApodListUiState> = _apodListUiState
 
     private val _selectedApod: MutableStateFlow<Apod?> = MutableStateFlow(null)
@@ -38,6 +35,12 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
     init {
         Log.d(TAG, "ApodViewModel.init...")
+        viewModelScope.launch {
+            apods.collect {
+                _apodListUiState.value = _apodListUiState.value.copy(apods = it)
+            }
+        }
+        fetchApods()
     }
 
     fun select(apod: Apod) {
@@ -50,24 +53,21 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
         curJob = viewModelScope.launch(Dispatchers.IO) {
             if (!isActive) return@launch
-            var hasApods = repository.curMonthHasApods(curDate.value)
-            Log.d(TAG, "hasApods: $hasApods")
-            if (!isActive) return@launch
             if (repository.needsUpdate(curDate.value)) {
                 if (!isActive) return@launch
+                var hasApods = repository.curMonthHasApods(curDate.value)
+                Log.d(TAG, "hasApods: $hasApods")
                 if (!hasApods) {
-                    _apodListUiState.value = ApodListUiState.Loading
+                    _apodListUiState.value = _apodListUiState.value.copy(loading = true)
                 }
                 when (val result = repository.updateApodsForCurMonth(curDate.value)) {
                     is ApodResult.Error -> {
-                        hasApods = repository.curMonthHasApods(curDate.value)
-                        _apodListUiState.value = ApodListUiState.Error(hasApods, result)
+                        _apodListUiState.value = _apodListUiState.value.copy(error = result)
                         return@launch
                     }
                 }
             }
-            hasApods = repository.curMonthHasApods(curDate.value)
-            _apodListUiState.value = ApodListUiState.Success(hasApods)
+            _apodListUiState.value = _apodListUiState.value.copy(loading = false)
         }
     }
 
@@ -189,9 +189,8 @@ data class BottomNavBarUiState(
 
 data class PickerUiState(val today: LocalDate, val curPickerDate: LocalDate)
 
-sealed class ApodListUiState {
-    object Idle : ApodListUiState()
-    object Loading : ApodListUiState()
-    class Error(val hasApods: Boolean, val error: ApodResult.Error) : ApodListUiState()
-    class Success(val hasApods: Boolean) : ApodListUiState()
-}
+data class ApodListUiState(
+    val loading: Boolean = false,
+    val error: ApodResult.Error? = null,
+    val apods: List<Apod> = emptyList()
+)
