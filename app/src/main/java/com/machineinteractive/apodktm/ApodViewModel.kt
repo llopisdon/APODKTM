@@ -53,6 +53,9 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
         curJob = viewModelScope.launch(Dispatchers.IO) {
             if (!isActive) return@launch
+
+            _apodListUiState.value = _apodListUiState.value.copy(error = null)
+
             if (repository.needsUpdate(curDate.value)) {
                 if (!isActive) return@launch
                 var hasApods = repository.curMonthHasApods(curDate.value)
@@ -62,11 +65,12 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
                 }
                 when (val result = repository.updateApodsForCurMonth(curDate.value)) {
                     is ApodResult.Error -> {
-                        _apodListUiState.value = _apodListUiState.value.copy(error = result)
+                        _apodListUiState.value = _apodListUiState.value.copy(error = result, loading = false)
                         return@launch
                     }
                 }
             }
+
             _apodListUiState.value = _apodListUiState.value.copy(loading = false)
         }
     }
