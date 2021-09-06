@@ -35,16 +35,10 @@ The latest DEBUG APK can be found here:
 
 # APOD API KEY
 
-The app looks for an APOD api key in this properties file:
+The app looks for an APOD api key in the project local.properties file:
 
 ```
-~/.gradle/gradle.properties
-```
-
-The api key property key/value pair should be defined as:
-
-```
-apodktm_nasa_apod_api_key=<YOUR API KEY>
+nasa_apod_api_key=<YOUR API KEY>
 ```
 
 If an APOD api key is not found then the demo APOD api key is used:
