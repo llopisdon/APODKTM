@@ -5,9 +5,11 @@
       <map>
         <entry key="app/src/main/res/layout-sw600dp/bottm_nav_bar.xml" value="0.31898907103825136" />
         <entry key="app/src/main/res/layout/bottm_nav_bar.xml" value="0.21783625730994152" />
+        <entry key="app/src/main/res/layout/fragment_apod_detail.xml" value="0.3161231884057971" />
         <entry key="app/src/main/res/layout/fragment_apods_list.xml" value="0.21783625730994152" />
         <entry key="app/src/main/res/layout/fragment_nav_overlay.xml" value="0.21783625730994152" />
-        <entry key="app/src/main/res/layout/list_item_apod.xml" value="0.21783625730994152" />
+        <entry key="app/src/main/res/layout/list_item_apod.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/list_item_apod_spacer.xml" value="0.44572649572649575" />
       </map>
     </option>
   </component>
