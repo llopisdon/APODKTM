@@ -114,11 +114,8 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
 
         adapter.submitList(state.apods)
 
-        if (state.apods.isEmpty() && !state.loading) {
-            toggleEmptyState(true)
-        } else {
-            toggleEmptyState(false)
-        }
+        val isEmpty = !state.loading && state.apods.isEmpty()
+        toggleEmptyState(isEmpty)
     }
 
     private fun toggleEmptyState(value: Boolean) {
