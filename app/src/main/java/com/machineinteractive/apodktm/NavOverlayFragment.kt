@@ -160,7 +160,7 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                     }
                     launch {
                         viewModel.bottomNavBarUiState.collect { state ->
-                            with (bottomNavBar) {
+                            with(bottomNavBar) {
                                 prevMonthButton.apply {
                                     if (state.prevMonthEnabled) show() else hide()
                                 }
@@ -171,7 +171,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                         }
                     }
                 }
-            }}
+            }
+        }
     }
 
     private fun setupPickerViews(curPickerDate: LocalDate) {
@@ -179,7 +180,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
         with(binding.monthYearPicker) {
 
             val curYear = curPickerDate.year
-            val curMonthText = resources.getStringArray(R.array.months)[curPickerDate.monthNumber-1]
+            val curMonthText =
+                resources.getStringArray(R.array.months)[curPickerDate.monthNumber - 1]
 
             curMonthYear.text = resources.getString(R.string.cur_month_year, curMonthText, curYear)
 
@@ -205,13 +207,14 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                 }
             }
 
-            (monthChips[curPickerDate.monthNumber-1] as Chip).isChecked = true
+            (monthChips[curPickerDate.monthNumber - 1] as Chip).isChecked = true
         }
     }
 
     private fun setBottomNavBarMonthButtonText(today: LocalDate) {
-        val curMonthText = resources.getStringArray(R.array.months)[today.monthNumber-1]
-        binding.bottomNavBar.monthButton.text = resources.getString(R.string.cur_month_year, curMonthText, today.year)
+        val curMonthText = resources.getStringArray(R.array.months)[today.monthNumber - 1]
+        binding.bottomNavBar.monthButton.text =
+            resources.getString(R.string.cur_month_year, curMonthText, today.year)
     }
 
     private fun openPicker() {
@@ -247,16 +250,25 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
     ) {
         when (destination.id) {
             R.id.apodsListFragment -> {
-                ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", 0f).apply {
-                    duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
-                    interpolator = DecelerateInterpolator()
-                    start()
-                }
+                ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", 0f)
+                    .apply {
+                        duration =
+                            resources.getInteger(R.integer.material_transition_duration_medium)
+                                .toLong()
+                        interpolator = DecelerateInterpolator()
+                        start()
+                    }
             }
             R.id.apodDetailFragment -> {
-                val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
-                ObjectAnimator.ofFloat(binding.bottomNavBar.bottomNavBar, "translationY", bottomNavHeight).apply {
-                    duration = resources.getInteger(R.integer.material_transition_duration_medium).toLong()
+                val bottomNavHeight =
+                    resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
+                ObjectAnimator.ofFloat(
+                    binding.bottomNavBar.bottomNavBar,
+                    "translationY",
+                    bottomNavHeight
+                ).apply {
+                    duration =
+                        resources.getInteger(R.integer.material_transition_duration_medium).toLong()
                     interpolator = FastOutLinearInInterpolator()
                     start()
                 }

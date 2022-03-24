@@ -16,12 +16,13 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
 
     private val curDate = MutableStateFlow(maxDate)
     private var pickerCurDate = maxDate
-    @ExperimentalCoroutinesApi
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val apods: Flow<List<Apod>> = curDate.flatMapLatest {
         repository.getApodsForCurMonth(it)
     }
 
-    private val _apodListUiState = MutableStateFlow(ApodListUiState())
+    private val _apodListUiState = MutableStateFlow(ApodListUiState(loading = true))
     val apodListUiState: StateFlow<ApodListUiState> = _apodListUiState
 
     private val _selectedApod: MutableStateFlow<Apod?> = MutableStateFlow(null)
@@ -47,31 +48,44 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         _selectedApod.value = apod
     }
 
-    var curJob: Job? = null
+    private var curJob: Job? = null
 
     fun fetchApods() {
-        Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
+
         curJob = viewModelScope.launch(Dispatchers.IO) {
+
+            Log.d(TAG, "ApodViewModel.fetchApods - curDate: ${curDate.value} ...")
+
             if (!isActive) return@launch
 
-            _apodListUiState.value = _apodListUiState.value.copy(error = null)
+            _apodListUiState.value = _apodListUiState.value.copy(error = null, lastUpdate = null)
 
-            if (repository.needsUpdate(curDate.value)) {
+            val needsUpdate = repository.needsUpdate(curDate.value)
+            Log.d(TAG, "NEEDS UPDATE -> $needsUpdate")
+
+            if (needsUpdate) {
                 if (!isActive) return@launch
-                var hasApods = repository.curMonthHasApods(curDate.value)
+                val hasApods = repository.curMonthHasApods(curDate.value)
                 Log.d(TAG, "hasApods: $hasApods")
                 if (!hasApods) {
                     _apodListUiState.value = _apodListUiState.value.copy(loading = true)
                 }
                 when (val result = repository.updateApodsForCurMonth(curDate.value)) {
                     is ApodResult.Error -> {
-                        _apodListUiState.value = _apodListUiState.value.copy(error = result, loading = false)
+                        _apodListUiState.value = _apodListUiState.value.copy(
+                            error = result,
+                            loading = false
+                        )
                         return@launch
+                    }
+                    else -> {
+                        // NO-OP
                     }
                 }
             }
 
-            _apodListUiState.value = _apodListUiState.value.copy(loading = false)
+            val lastUpdate = repository.lastUpdate(curDate.value)
+            _apodListUiState.value = _apodListUiState.value.copy(lastUpdate = lastUpdate, loading = false)
         }
     }
 
@@ -195,6 +209,7 @@ data class PickerUiState(val today: LocalDate, val curPickerDate: LocalDate)
 
 data class ApodListUiState(
     val loading: Boolean = false,
+    val lastUpdate: LastUpdate? = null,
     val error: ApodResult.Error? = null,
     val apods: List<Apod> = emptyList()
 )

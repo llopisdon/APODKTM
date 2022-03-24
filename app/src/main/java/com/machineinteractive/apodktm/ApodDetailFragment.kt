@@ -174,7 +174,7 @@ class ApodDetailFragment : Fragment() {
             apodDateCopyright.text = if (apod.copyright.isNullOrEmpty()) {
                 "${apod.date}"
             } else {
-                "${apod.date} ${"(" + apod.copyright + ")" ?: ""}"
+                "${apod.date} (${apod.copyright})"
             }
 
             apodExplanation.text = apod.explanation
@@ -189,7 +189,11 @@ class ApodDetailFragment : Fragment() {
             val intent = Intent(Intent.ACTION_VIEW, webpage)
             startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(requireContext().applicationContext, R.string.no_video_player_found, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext().applicationContext,
+                R.string.no_video_player_found,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

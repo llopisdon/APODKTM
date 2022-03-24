@@ -63,7 +63,7 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
         adapter = ApodAdapter(this)
 
         val isWideScreen = resources.getBoolean(R.bool.wide_screen)
-        val isLandscape  = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         val useGridLayout = isLandscape || isWideScreen
 
         binding.run {
@@ -96,6 +96,7 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
     }
 
     private fun updateUi(state: ApodListUiState) {
+
         showProgressBar(state.loading)
 
         if (state.error != null) {
@@ -114,7 +115,7 @@ class ApodsListFragment : Fragment(), ApodAdapter.Listener {
 
         adapter.submitList(state.apods)
 
-        val isEmpty = !state.loading && state.apods.isEmpty()
+        val isEmpty = state.lastUpdate != null && state.apods.isEmpty()
         toggleEmptyState(isEmpty)
     }
 
@@ -176,7 +177,12 @@ class ApodAdapter(private val listener: ApodAdapter.Listener) :
             binding.title.text = "${apod.title}"
             binding.date.text = "${apod.date}"
 
-            binding.image.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur))
+            binding.image.setImageDrawable(
+                ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur
+                )
+            )
 
             val (imageUrl, videoIndicatorVisibility) = if (apod.media_type == "image") {
                 Pair(apod.url.orEmpty(), View.INVISIBLE)
@@ -195,7 +201,7 @@ class ApodAdapter(private val listener: ApodAdapter.Listener) :
                     binding.image.setImageDrawable(result)
                     binding.apod.isClickable = true
                     binding.apod.isCheckable = true
-                },onError = {
+                }, onError = {
                     binding.apod.isClickable = true
                     binding.apod.isCheckable = true
                 })

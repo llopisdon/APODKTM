@@ -34,6 +34,7 @@ class ApodRepository(private val apodDao: ApodDao) {
     }
 
     fun getApodsForCurMonth(date: LocalDate): Flow<List<Apod>> {
+        Log.d(TAG, "getApodsForCurMonth: $date")
         val (startDate, endDate) = getStartEndRangeForDate(date)
         return apodDao.getApods(startDate, endDate)
     }
@@ -59,25 +60,9 @@ class ApodRepository(private val apodDao: ApodDao) {
 
         Log.d(TAG, "updateApodsForCurMonth\n\tstartDate: $startDate | enddate: $endDate")
         val (apods, result) = fetchApods(startDate, endDate)
+        val lastUpdateId = getLastUpdateId(endDate)
+        apodDao.insertApods(apods, lastUpdateId)
 
-        apodDao.insertApods(apods)
-
-        val id = getLastUpdateId(endDate)
-        val timestamp = if (apods.isEmpty()) {
-            0L
-        } else {
-            Clock.System.now().toEpochMilliseconds()
-        }
-
-        Log.d(
-            TAG,
-            "\tHAS APODS: ${apods.isEmpty()} | set last update - id: $id timestamp: ${
-                Instant.fromEpochMilliseconds(timestamp)
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
-            }"
-        )
-
-        apodDao.setLastUpdate(LastUpdate(id, timestamp))
         return result
     }
 
@@ -186,6 +171,9 @@ class ApodRepository(private val apodDao: ApodDao) {
     private fun getLastUpdateId(date: LocalDate): String =
         "apod_${date.year}_${date.monthNumber}"
 
+    suspend fun lastUpdate(date: LocalDate): LastUpdate? =
+        apodDao.getLastUpdate(getLastUpdateId(date))
+
     suspend fun needsUpdate(date: LocalDate): Boolean {
 
         val id = getLastUpdateId(date)
@@ -225,12 +213,20 @@ class ApodRepository(private val apodDao: ApodDao) {
             val lastApod = apodDao.getApodForDay(lastDayOfMonthForDate)
 
             val nextMonthForDate = lastDayOfMonthForDate.plus(1, DateTimeUnit.DAY).atStartOfDayIn(
-                TimeZone.currentSystemDefault())
+                TimeZone.currentSystemDefault()
+            )
             val timeStampInstant = Instant.fromEpochMilliseconds(lastUpdate.timestamp)
-            val secondsUntil = timeStampInstant.until(nextMonthForDate, DateTimeUnit.SECOND, TimeZone.currentSystemDefault())
+            val secondsUntil = timeStampInstant.until(
+                nextMonthForDate,
+                DateTimeUnit.SECOND,
+                TimeZone.currentSystemDefault()
+            )
 
             if (secondsUntil > 0 && lastApod == null) {
-                Log.d(TAG, "needsUpdate: true - sec: $secondsUntil | PREV MONTH NEEDS ONE LAST CHECK FOR APODS")
+                Log.d(
+                    TAG,
+                    "needsUpdate: true - sec: $secondsUntil | PREV MONTH NEEDS ONE LAST CHECK FOR APODS"
+                )
                 return true
             } else {
                 Log.d(TAG, "needsUpdate: false - PREV MONTH UP-TO-DATE")

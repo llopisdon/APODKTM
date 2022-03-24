@@ -15,6 +15,7 @@ class Converters {
                 .date
         }
     }
+
     @TypeConverter
     fun localDateToTimestamp(date: LocalDate?): Long? {
         val tz = TimeZone.currentSystemDefault()
