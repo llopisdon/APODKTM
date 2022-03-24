@@ -35,7 +35,7 @@ The latest DEBUG APK can be found here:
 
 # APOD API KEY
 
-The app looks for an APOD api key in the project local.properties file:
+Gradle looks for an APOD api key in the project local.properties file:
 
 ```
 nasa_apod_api_key=<YOUR API KEY>
