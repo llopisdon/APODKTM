@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -14,7 +14,7 @@
         android:checkable="false"
         android:id="@+id/apod"
         android:layout_margin="8dp"
-        card_view:cardCornerRadius="16dp">
+        app:cardCornerRadius="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                     android:layout_width="@dimen/video_indicator_size"
                     android:layout_height="@dimen/video_indicator_size"
                     android:src="@drawable/ic_baseline_play_circle_filled_24"
-                    card_view:tint="@color/video_indicator_tint"
+                    app:tint="@color/video_indicator_tint"
                     android:layout_gravity="center" />
 
             </FrameLayout>
@@ -51,9 +51,9 @@
                 android:textAppearance="?attr/textAppearanceHeadline5"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:autoSizeTextType="uniform"
-                card_view:autoSizeMinTextSize="12sp"
-                card_view:autoSizeMaxTextSize="24sp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMaxTextSize="24sp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="12dp"
@@ -66,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                card_view:autoSizeTextType="uniform"
-                card_view:autoSizeMaxTextSize="16sp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMaxTextSize="16sp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:layout_marginStart="16dp"
