@@ -62,7 +62,7 @@ https://apod.nasa.gov/
 
 https://github.com/nasa/apod-api
 
-## Icon & Place Holder Image
+## Icon & Place Holder Image Attribution
 
 **"Very Large Array, Socorro, United States"**
 
