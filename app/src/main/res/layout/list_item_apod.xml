@@ -46,28 +46,30 @@
             <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="start|center_vertical"
+                android:layout_height="64dp"
+                android:gravity="start|top"
                 android:textAppearance="?attr/textAppearanceHeadline5"
-                card_view:autoSizeTextType="uniform"
-                card_view:autoSizeMaxTextSize="36sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp"
-                tools:text="TITLE GOES HERE"/>
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                tools:text="TITLE GOES HERE TITLE GOES HERE TITLE GOES HERE TITLE GOES HERE TITLE GOES HERE TITLE GOES HERE TITLE GOES HERE" />
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="start|center_vertical"
+                android:layout_height="wrap_content"
+                android:gravity="start"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 card_view:autoSizeTextType="uniform"
-                card_view:autoSizeMaxTextSize="36sp"
-                android:layout_marginBottom="8dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                card_view:autoSizeMaxTextSize="16sp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="12dp"
                 tools:text="06.16.1995"/>
 
             <View
