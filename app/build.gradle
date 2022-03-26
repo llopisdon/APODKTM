@@ -22,7 +22,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 31
         versionCode 1
-        versionName "1.1.8"
+        versionName "1.1.9"
 
         def apodApiKey = localProperties["nasa_apod_api_key"] ?: 'DEMO_KEY'
         println("APOD KEY: $apodApiKey")
