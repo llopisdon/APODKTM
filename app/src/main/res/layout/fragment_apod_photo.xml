@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/apod_image"
+        android:layout_width="match_parent"
+        android:layout_height="392dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_arrow_back_24"
+        android:contentDescription="@string/back_button"
+        android:layout_margin="@dimen/detail_text_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:fabSize="mini"
+        app:backgroundTint="?attr/colorPrimaryVariant"
+        app:tint="?attr/colorOnSurface"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/share_link_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_link_24"
+        android:layout_margin="@dimen/detail_text_padding"
+        app:layout_constraintEnd_toStartOf="@id/share_photo_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:fabSize="mini"
+        app:backgroundTint="?attr/colorPrimaryVariant"
+        app:tint="?attr/colorOnSurface"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/share_photo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_share_24"
+        android:layout_margin="@dimen/detail_text_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:fabSize="mini"
+        app:backgroundTint="?attr/colorPrimaryVariant"
+        app:tint="?attr/colorOnSurface"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

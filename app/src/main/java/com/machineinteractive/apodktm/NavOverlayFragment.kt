@@ -259,7 +259,8 @@ class NavOverlayFragment : Fragment(), NavController.OnDestinationChangedListene
                         start()
                     }
             }
-            R.id.apodDetailFragment -> {
+            R.id.apodDetailFragment,
+            R.id.apodPhotoFragment -> {
                 val bottomNavHeight =
                     resources.getDimensionPixelSize(R.dimen.bottom_nav_bar_height).toFloat()
                 ObjectAnimator.ofFloat(

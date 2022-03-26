@@ -21,16 +21,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:orientation="vertical">
 
-
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="392dp">
 
-                <com.github.chrisbanes.photoview.PhotoView
+                <ImageView
                     android:id="@+id/apod_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
+                    android:clickable="false"
                     tools:src="@drawable/donald_giannatti_very_large_array_socorro_usa_unsplash_1232x820_blur" />
 
                 <ImageView
@@ -41,7 +41,7 @@
                     android:layout_gravity="center"
                     app:tint="@color/video_indicator_tint"
                     android:visibility="invisible"
-                    android:clickable="true"
+                    android:clickable="false"
                     tools:visibility="visible" />
 
             </FrameLayout>

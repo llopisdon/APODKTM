@@ -3,6 +3,7 @@
 
     <string name="list_item_apod_card_transition_name">apod_card_%1$s</string>
     <string name="apod_detail_transition_name">apod_card_detail</string>
+    <string name="apod_photo_transition_name">apod_photo</string>
     <string name="share_photo_with">Share Photo With...</string>
     <string name="share_link_with">Share Link With...</string>
 

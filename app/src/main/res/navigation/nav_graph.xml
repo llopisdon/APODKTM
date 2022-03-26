@@ -17,5 +17,15 @@
         android:id="@+id/apodDetailFragment"
         android:name="com.machineinteractive.apodktm.ApodDetailFragment"
         android:label="fragment_apod_detail"
-        tools:layout="@layout/fragment_apod_detail" />
+        tools:layout="@layout/fragment_apod_detail" >
+        <action
+            android:id="@+id/action_apodDetailFragment_to_apodPhotoFragment"
+            app:destination="@id/apodPhotoFragment"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/apodPhotoFragment"
+        android:name="com.machineinteractive.apodktm.ApodPhotoFragment"
+        android:label="fragment_apod_photo"
+        tools:layout="@layout/fragment_apod_photo" />
 </navigation>
